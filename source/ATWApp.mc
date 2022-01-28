@@ -21,10 +21,6 @@ class ATWApp extends Application.AppBase {
         return [ new ATWView() ] as Array<Views or InputDelegates>;
     }
 
-    function getSettingsView() {
-        return [new SettingsView(), new SettingsDelegate()];
-    }
-
 }
 
 function getApp() as ATWApp {

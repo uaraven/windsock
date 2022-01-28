@@ -3,7 +3,7 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 import Toybox.Math;
-import Toybox.Application.Properties;
+import Toybox.System;
 
 class ATWView extends WatchUi.DataField {
 
@@ -87,10 +87,10 @@ class ATWView extends WatchUi.DataField {
     }
 
     function convertSpeed(speed as Numeric) as Numeric {
-        switch (unitsNameId) {
-            case 1: 
+        switch (System.getDeviceSettings().paceUnits) {
+            case System.UNIT_METRIC: 
                 return speed * 3.6;
-            case 2: 
+            case System.UNIT_STATUTE: 
                 return speed * 2.237;
             default:
                 return speed;
@@ -132,7 +132,8 @@ class ATWView extends WatchUi.DataField {
         var unit = View.findDrawableById("unit") as Text;
         var wind = View.findDrawableById("speed") as Text;
 
-        unit.setText(getUnitsName());
+        unit.setText(System.getDeviceSettings().paceUnits == System.UNIT_STATUTE ? 
+            Application.loadResource(Rez.Strings.unitMph) : Application.loadResource(Rez.Strings.unitKph) );
 
         var fg = Graphics.COLOR_BLACK;
         var bg = Graphics.COLOR_TRANSPARENT;

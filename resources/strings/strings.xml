@@ -11,9 +11,4 @@
     <string id="unitKph">km/h</string>
     <string id="unitMph">mph</string>
 
-    <string id="SettingsMenuTitle">Settings</string>
-    <string id="UnitsMenuLabel">Wind speed units</string>
-
-    <string id="pressMenu">Press menu\nfor settings</string>
-
 </strings>
