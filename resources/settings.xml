@@ -1,0 +1,12 @@
+<resources>
+    <settings>
+
+        <setting propertyKey="@Properties.units" title="@Strings.WindSpeedUnits" prompt="@Strings.WindSpeedPrompt">
+            <settingConfig type="list">
+                <listEntry value="0">@Strings.Mps</listEntry>
+                <listEntry value="1">@Strings.Kph</listEntry>
+                <listEntry value="2">@Strings.Mph</listEntry>
+            </settingConfig>
+        </setting>
+    </settings>
+</resources>

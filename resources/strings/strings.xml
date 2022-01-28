@@ -1,5 +1,19 @@
 <strings>
-    <string id="AppName">ATW</string>
+    <string id="AppName">Windsock</string>
 
-    <string id="label">My Value</string>
+    <string id="WindSpeedUnits">Units</string>
+    <string id="WindSpeedPrompt">Units for wind speed</string>
+    <string id="Mps">Meters/second</string>
+    <string id="Kph">Kilometers/hour</string>
+    <string id="Mph">Miles/hour</string>
+
+    <string id="unitMps">m/s</string>
+    <string id="unitKph">km/h</string>
+    <string id="unitMph">mph</string>
+
+    <string id="SettingsMenuTitle">Settings</string>
+    <string id="UnitsMenuLabel">Wind speed units</string>
+
+    <string id="pressMenu">Press menu\nfor settings</string>
+
 </strings>

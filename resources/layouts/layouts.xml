@@ -1,8 +1,8 @@
 <layouts>
-    <!-- A generic, centered layout. -->
-    <layout id="MainLayout">
+    <layout id="DatafieldLayout">
         <drawable class="Background" />
         <label id="speed" x="50%" y="35%" color="Graphics.COLOR_LT_GRAY" justification="Graphics.TEXT_JUSTIFY_CENTER" font="Graphics.FONT_NUMBER_MEDIUM" />
         <label id="unit" x="50%" y="80%" color="Graphics.COLOR_WHITE" justification="Graphics.TEXT_JUSTIFY_CENTER" font="Graphics.FONT_TINY" />
     </layout>
+
 </layouts>

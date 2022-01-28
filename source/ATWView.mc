@@ -3,6 +3,7 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 import Toybox.Math;
+import Toybox.Application.Properties;
 
 class ATWView extends WatchUi.DataField {
 
@@ -15,6 +16,7 @@ class ATWView extends WatchUi.DataField {
 
     hidden var mHeading as Numeric;
     hidden var mWindSpeed as Numeric;
+    hidden var mWindSpeedMs as Numeric;
     hidden var mWindBearing as Numeric;
     hidden var mWindValid as Boolean;
 
@@ -22,10 +24,13 @@ class ATWView extends WatchUi.DataField {
     hidden var roseY as Numeric;
     hidden var roseR as Numeric;
 
+    private var units as String;
+
     function initialize() {
         DataField.initialize();
         mHeading = 0.0f;
         mWindSpeed = 0.0f;
+        mWindSpeedMs = -1;
         mWindBearing = 0.0f;
         mWindValid = false;
     }
@@ -41,7 +46,7 @@ class ATWView extends WatchUi.DataField {
     // Set your layout here. Anytime the size of obscurity of
     // the draw context is changed this will be called.
     function onLayout(dc as Dc) as Void {
-        View.setLayout(Rez.Layouts.MainLayout(dc));
+        View.setLayout(Rez.Layouts.DatafieldLayout(dc));
         var speedView = View.findDrawableById("speed");
         // labelView.locY = labelView.locY - 16;
         var unitView = View.findDrawableById("unit");
@@ -60,7 +65,6 @@ class ATWView extends WatchUi.DataField {
             unitD = dc.getTextDimensions("km/h", Graphics.FONT_TINY);
             unitView.setFont(Graphics.FONT_XTINY);
         }
-
 
         if (dc.getWidth() > dc.getHeight()) {
             speedView.locX = dc.getWidth()/2 + (dc.getWidth()/2 - speedView.width)/2;
@@ -82,6 +86,17 @@ class ATWView extends WatchUi.DataField {
         }
     }
 
+    function convertSpeed(speed as Numeric) as Numeric {
+        switch (unitsNameId) {
+            case 1: 
+                return speed * 3.6;
+            case 2: 
+                return speed * 2.237;
+            default:
+                return speed;
+        }
+    }
+
     // The given info object contains all the current workout information.
     // Calculate a value and save it locally in this method.
     // Note that compute() and onUpdate() are asynchronous, and there is no
@@ -97,10 +112,12 @@ class ATWView extends WatchUi.DataField {
         }
         var w = Weather.getCurrentConditions();
         if (w != null) {
-            mWindSpeed = w.windSpeed;
+            mWindSpeedMs = w.windSpeed;
+            mWindSpeed = convertSpeed(w.windSpeed);
             mWindBearing = w.windBearing;
         } else {
             mWindSpeed = -1;
+            mWindSpeedMs = -1;
             mWindBearing = 0;
         }
     }
@@ -115,6 +132,8 @@ class ATWView extends WatchUi.DataField {
         var unit = View.findDrawableById("unit") as Text;
         var wind = View.findDrawableById("speed") as Text;
 
+        unit.setText(getUnitsName());
+
         var fg = Graphics.COLOR_BLACK;
         var bg = Graphics.COLOR_TRANSPARENT;
         if (getBackgroundColor() == Graphics.COLOR_BLACK) {
@@ -126,13 +145,11 @@ class ATWView extends WatchUi.DataField {
             wind.setColor(Graphics.COLOR_BLACK);
             fg = Graphics.COLOR_LT_GRAY;
         }
-        if (mWindSpeed >= 0) {
+        if (mWindSpeedMs >= 0) {
             wind.setText(mWindSpeed.format("%.1f"));
         } else {
             wind.setText("N/A");
         }
-
-        unit.setText("m/s");
 
         // Call parent's onUpdate(dc) to redraw the layout
         View.onUpdate(dc);
@@ -147,13 +164,13 @@ class ATWView extends WatchUi.DataField {
 
         var poly = arrowToPoly(roseX, roseY ,roseR, Math.toRadians(mWindBearing + 180) + mHeading);
         var color = Graphics.COLOR_GREEN;
-        if (mWindSpeed > 3) {
+        if (mWindSpeedMs > 3) {
             color = Graphics.COLOR_YELLOW;
         } 
-        if (mWindSpeed > 6) {
+        if (mWindSpeedMs > 6) {
             color = Graphics.COLOR_ORANGE;
         } 
-        if (mWindSpeed > 9) {
+        if (mWindSpeedMs > 9) {
             color = Graphics.COLOR_RED;
         }
         dc.setColor(color, bg);
