@@ -4,6 +4,7 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 import Toybox.Math;
 import Toybox.System;
+import Toybox.Weather;
 
 class ATWView extends WatchUi.DataField {
 

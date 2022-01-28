@@ -6,7 +6,6 @@ Connect IQ data field which displays wind direction relative to the direction yo
 
 Requires Connect IQ 3.2 and higher and works* on following devices:
  
-  - Edge 130+
   - Edge 530
   - Edge 830
   - Edge 1030
