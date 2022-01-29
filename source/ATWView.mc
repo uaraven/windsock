@@ -8,6 +8,42 @@ import Toybox.Weather;
 
 class ATWView extends WatchUi.DataField {
 
+    // following 3 arrays contains color mappings for the wind indicator
+    // if the wind speed in m/s is higher than the number in the first array element, 
+    // then the color from the second array element is chosen
+    // there are three arrays, for headwind, sidewinds and the tailwind
+
+    private var headwindColors = [
+        [0, Graphics.COLOR_GREEN],
+        [3, Graphics.COLOR_YELLOW],
+        [6, Graphics.COLOR_ORANGE],
+        [9, Graphics.COLOR_RED]
+    ];
+
+    private var sidewindColors = [
+        [0, Graphics.COLOR_GREEN],
+        [6, Graphics.COLOR_YELLOW],
+        [9, Graphics.COLOR_ORANGE],
+        [12, Graphics.COLOR_RED]
+    ];
+
+    private var tailwindColors = [
+        [0, Graphics.COLOR_GREEN]
+    ];
+
+    // mapping between relative wind bearing and the wind speed color mapping
+    // i.e. if the wind bearing is between ±60º from the front it is treated as a headwind
+    // if the wind comes from anywhere from the back, it is treated as a tailwind (even if it is side-ish tailwind)
+
+    private var headingColors = [
+        [-180, -120, headwindColors],
+        [120, 180, headwindColors],
+        [90, 120, sidewindColors],
+        [-120, -90, sidewindColors],
+        [-90, 90, tailwindColors]
+    ];
+
+
     private var arrow = [
         new Vector2(0, -0.9),
         new Vector2(-0.33, 0.8),
@@ -121,6 +157,27 @@ class ATWView extends WatchUi.DataField {
         }
     }
 
+    function getArrowColor() {
+        var heading = (mWindBearing + 180 + Math.toDegrees(mHeading)).toLong();
+        if (heading > 180) {
+            heading = heading - 360;
+        }
+        // chose color mapping based on heading
+        var colorMap = headwindColors;
+        for (var i = 0; i < headingColors.size(); i++) {
+            if (heading >= headingColors[i][0] && heading <= headingColors[i][1]) {
+                colorMap = headingColors[i][2];
+                break;
+            }
+        }
+        for (var i = colorMap.size()-1 ; i >= 0; i--) {
+            if (mWindSpeedMs > colorMap[i][0]) {
+                return colorMap[i][1];
+            }
+        }
+        return colorMap[0][1];
+    }
+
     // Display the value you computed here. This will be called
     // once a second when the data field is visible.
     function onUpdate(dc as Dc) as Void {
@@ -162,16 +219,7 @@ class ATWView extends WatchUi.DataField {
         dc.drawCircle(indicatorX, indicatorY, indicatorR);
 
         var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, Math.toRadians(mWindBearing + 180) + mHeading);
-        var color = Graphics.COLOR_GREEN;
-        if (mWindSpeedMs > 3) {
-            color = Graphics.COLOR_YELLOW;
-        } 
-        if (mWindSpeedMs > 6) {
-            color = Graphics.COLOR_ORANGE;
-        } 
-        if (mWindSpeedMs > 9) {
-            color = Graphics.COLOR_RED;
-        }
+        var color = getArrowColor();
         dc.setColor(color, bg);
         dc.fillPolygon(poly);
     }
