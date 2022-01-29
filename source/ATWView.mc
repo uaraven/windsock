@@ -9,10 +9,10 @@ import Toybox.Weather;
 class ATWView extends WatchUi.DataField {
 
     private var arrow = [
-        new Vector2(0, -1),
-        new Vector2(-0.2, 1),
-        new Vector2(0, 0.8),
-        new Vector2(0.2, 1)
+        new Vector2(0, -0.9),
+        new Vector2(-0.33, 0.8),
+        new Vector2(0, 0.6),
+        new Vector2(0.33, 0.8)
     ];
 
     hidden var mHeading as Numeric;
