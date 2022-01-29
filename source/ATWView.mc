@@ -44,6 +44,10 @@ class ATWView extends WatchUi.DataField {
         return result;
     }
 
+    private function min(a as Numeric, b as Numeric) as Numeric {
+        return (a > b) ? b : a;
+    }
+
     // Set your layout here. Anytime the size of obscurity of
     // the draw context is changed this will be called.
     function onLayout(dc as Dc) as Void {
@@ -69,21 +73,23 @@ class ATWView extends WatchUi.DataField {
 
         if (dc.getWidth() > dc.getHeight()) {
             speedView.locX = dc.getWidth()/2 + (dc.getWidth()/2 - speedView.width)/2;
-            speedView.locY = (dc.getHeight() / 2 -  speedD[1]);           
+            speedView.locY = (dc.getHeight() / 2 -  speedD[1]+8);           
             unitView.locX = dc.getWidth()/2 +  (dc.getWidth()/2 - unitView.width)/2;
             unitView.locY = dc.getHeight()/2 + 3;
             roseX = dc.getWidth() / 4;
             roseY = dc.getHeight() / 2;
-            roseR = dc.getHeight() / 4 - 2;
+            var hw = dc.getWidth() / 3;
+            var hh = dc.getHeight() / 3;
+            roseR = min(hw, hh);
         } else {
             speedView.locX = (dc.getWidth() - speedView.width)/2;
-            speedView.locY = dc.getHeight() / 2;
+            speedView.locY =  20 + dc.getHeight() / 2;
             unitView.locX = (dc.getWidth() - unitView.width)/2;
-            unitView.locY = 4 * dc.getWidth()/5;
+            unitView.locY = speedView.locY + speedD[1];
             unitView.width = dc.getWidth();
             roseX = dc.getWidth() / 2;
             roseY = dc.getHeight() / 4;
-            roseR = dc.getWidth() / 4 - 5;
+            roseR = dc.getWidth() / 3 - 3;
         }
     }
 
