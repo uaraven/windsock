@@ -21,9 +21,9 @@ class ATWView extends WatchUi.DataField {
     hidden var mWindBearing as Numeric;
     hidden var mWindValid as Boolean;
 
-    hidden var roseX as Numeric;
-    hidden var roseY as Numeric;
-    hidden var roseR as Numeric;
+    hidden var indicatorX as Numeric;
+    hidden var indicatorY as Numeric;
+    hidden var indicatorR as Numeric;
 
     private var units as String;
 
@@ -53,13 +53,10 @@ class ATWView extends WatchUi.DataField {
     function onLayout(dc as Dc) as Void {
         View.setLayout(Rez.Layouts.DatafieldLayout(dc));
         var speedView = View.findDrawableById("speed");
-        // labelView.locY = labelView.locY - 16;
         var unitView = View.findDrawableById("unit");
-        // valueView.locY = valueView.locY + 7;
 
         speedView.setJustification(Graphics.TEXT_JUSTIFY_CENTER); 
         unitView.setJustification(Graphics.TEXT_JUSTIFY_CENTER); 
-        (View.findDrawableById("unit") as Text).setText("m/s");
 
         var speedD = dc.getTextDimensions("180.0", Graphics.FONT_NUMBER_MEDIUM);
         var unitD = dc.getTextDimensions("km/h", Graphics.FONT_TINY);
@@ -76,20 +73,20 @@ class ATWView extends WatchUi.DataField {
             speedView.locY = (dc.getHeight() / 2 -  speedD[1]+8);           
             unitView.locX = dc.getWidth()/2 +  (dc.getWidth()/2 - unitView.width)/2;
             unitView.locY = dc.getHeight()/2 + 3;
-            roseX = dc.getWidth() / 4;
-            roseY = dc.getHeight() / 2;
+            indicatorX = dc.getWidth() / 4;
+            indicatorY = dc.getHeight() / 2;
             var hw = dc.getWidth() / 3;
             var hh = dc.getHeight() / 3;
-            roseR = min(hw, hh);
+            indicatorR = min(hw, hh);
         } else {
             speedView.locX = (dc.getWidth() - speedView.width)/2;
             speedView.locY =  20 + dc.getHeight() / 2;
             unitView.locX = (dc.getWidth() - unitView.width)/2;
             unitView.locY = speedView.locY + speedD[1];
             unitView.width = dc.getWidth();
-            roseX = dc.getWidth() / 2;
-            roseY = dc.getHeight() / 4;
-            roseR = dc.getWidth() / 3 - 3;
+            indicatorX = dc.getWidth() / 2;
+            indicatorY = dc.getHeight() / 4;
+            indicatorR = dc.getWidth() / 3 - 3;
         }
     }
 
@@ -104,12 +101,7 @@ class ATWView extends WatchUi.DataField {
         }
     }
 
-    // The given info object contains all the current workout information.
-    // Calculate a value and save it locally in this method.
-    // Note that compute() and onUpdate() are asynchronous, and there is no
-    // guarantee that compute() will be called before onUpdate().
     function compute(info as Activity.Info) as Void {
-        // See Activity.Info in the documentation for available information.
         if(info has :currentHeading){
             if (info.currentHeading != null) {
                 mHeading = info.currentHeading as Number;
@@ -162,15 +154,14 @@ class ATWView extends WatchUi.DataField {
         // Call parent's onUpdate(dc) to redraw the layout
         View.onUpdate(dc);
 
-        
         dc.setPenWidth(2);
         dc.setAntiAlias(true);
         dc.setColor(0xFF101040, bg);
-        dc.fillCircle(roseX, roseY, roseR);
+        dc.fillCircle(indicatorX, indicatorY, indicatorR);
         dc.setColor(fg, bg);
-        dc.drawCircle(roseX, roseY, roseR);
+        dc.drawCircle(indicatorX, indicatorY, indicatorR);
 
-        var poly = arrowToPoly(roseX, roseY ,roseR, Math.toRadians(mWindBearing + 180) + mHeading);
+        var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, Math.toRadians(mWindBearing + 180) + mHeading);
         var color = Graphics.COLOR_GREEN;
         if (mWindSpeedMs > 3) {
             color = Graphics.COLOR_YELLOW;
@@ -183,14 +174,6 @@ class ATWView extends WatchUi.DataField {
         }
         dc.setColor(color, bg);
         dc.fillPolygon(poly);
-
-        // dc.setColor(Graphics.COLOR_BLUE, bg);        
-        // poly = arrowToPoly(20, 20 , 20,  -mHeading);
-        // dc.fillPolygon(poly);
-
-        // dc.setColor(Graphics.COLOR_GREEN, bg);        
-        // poly = arrowToPoly(dc.getWidth()-20, 20 , 20,  Math.toRadians(mWindBearing+180));
-        // dc.fillPolygon(poly);
     }
 
 }
