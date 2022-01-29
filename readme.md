@@ -15,6 +15,7 @@ Data field displays direction the wind is coming at you and wind speed (units de
 
 ![](data_field.png)
 
+Arrow will change the color from green to red depending on the wind strength and direction, i.e. tailwind is always good(green) and light headwind is not a big deal either (green), but stronger headwind will be shown in orange or red.
 
 -----
 \* should work, at least
