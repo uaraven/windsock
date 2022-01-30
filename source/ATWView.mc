@@ -150,10 +150,17 @@ class ATWView extends WatchUi.DataField {
             mWindSpeedMs = w.windSpeed;
             mWindSpeed = convertSpeed(w.windSpeed);
             mWindBearing = w.windBearing;
+            mWindValid = true;
         } else {
             mWindSpeed = -1;
             mWindSpeedMs = -1;
             mWindBearing = 0;
+            mWindValid = false;
+        }
+
+        if (mWindBearing == null) {
+            mWindBearing = 0;
+            mWindValid = false;
         }
     }
 
@@ -202,26 +209,33 @@ class ATWView extends WatchUi.DataField {
             wind.setColor(Graphics.COLOR_BLACK);
             fg = Graphics.COLOR_LT_GRAY;
         }
-        if (mWindSpeedMs >= 0) {
+        if (mWindValid) {
             wind.setText(mWindSpeed.format("%.1f"));
+
+            // Call parent's onUpdate(dc) to redraw the layout
+            View.onUpdate(dc);
+
+            dc.setPenWidth(2);
+            dc.setAntiAlias(true);
+            dc.setColor(0xFF101040, bg);
+            dc.fillCircle(indicatorX, indicatorY, indicatorR);
+            dc.setColor(fg, bg);
+            dc.drawCircle(indicatorX, indicatorY, indicatorR);
+
+            var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, Math.toRadians(mWindBearing + 180) + mHeading);
+            var color = getArrowColor();
+            dc.setColor(color, bg);
+            dc.fillPolygon(poly);
         } else {
-            wind.setText("N/A");
+            wind.setText("");
+            unit.setText("");
+            // Call parent's onUpdate(dc) to redraw the layout
+            View.onUpdate(dc);
+            dc.setColor(Graphics.COLOR_ORANGE, bg);
+            dc.drawText(dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_SMALL, "No weather data", Graphics.TEXT_JUSTIFY_CENTER + Graphics.TEXT_JUSTIFY_VCENTER);
+
         }
 
-        // Call parent's onUpdate(dc) to redraw the layout
-        View.onUpdate(dc);
-
-        dc.setPenWidth(2);
-        dc.setAntiAlias(true);
-        dc.setColor(0xFF101040, bg);
-        dc.fillCircle(indicatorX, indicatorY, indicatorR);
-        dc.setColor(fg, bg);
-        dc.drawCircle(indicatorX, indicatorY, indicatorR);
-
-        var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, Math.toRadians(mWindBearing + 180) + mHeading);
-        var color = getArrowColor();
-        dc.setColor(color, bg);
-        dc.fillPolygon(poly);
     }
 
 }
