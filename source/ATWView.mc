@@ -61,7 +61,9 @@ class ATWView extends WatchUi.DataField {
     hidden var indicatorY as Numeric;
     hidden var indicatorR as Numeric;
 
-    private var units as String;
+    private var mph as String;
+    private var kmh as String;
+    private var noWeather as String;
 
     function initialize() {
         DataField.initialize();
@@ -70,6 +72,10 @@ class ATWView extends WatchUi.DataField {
         mWindSpeedMs = -1;
         mWindBearing = 0.0f;
         mWindValid = false;
+
+        mph = Application.loadResource(Rez.Strings.unitMph);
+        kmh = Application.loadResource(Rez.Strings.unitKph);
+        noWeather = Application.loadResource(Rez.Strings.noWeather);
     }
 
     private function arrowToPoly( dx as Numeric, dy as Numeric, sz as Numeric, rot as Numeric) {
@@ -195,8 +201,7 @@ class ATWView extends WatchUi.DataField {
         var unit = View.findDrawableById("unit") as Text;
         var wind = View.findDrawableById("speed") as Text;
 
-        unit.setText(System.getDeviceSettings().paceUnits == System.UNIT_STATUTE ? 
-            Application.loadResource(Rez.Strings.unitMph) : Application.loadResource(Rez.Strings.unitKph) );
+        unit.setText(System.getDeviceSettings().paceUnits == System.UNIT_STATUTE ? mph : kmh );
 
         var fg = Graphics.COLOR_BLACK;
         var bg = Graphics.COLOR_TRANSPARENT;
@@ -232,7 +237,7 @@ class ATWView extends WatchUi.DataField {
             // Call parent's onUpdate(dc) to redraw the layout
             View.onUpdate(dc);
             dc.setColor(Graphics.COLOR_ORANGE, bg);
-            dc.drawText(dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_SMALL, "No weather data", Graphics.TEXT_JUSTIFY_CENTER + Graphics.TEXT_JUSTIFY_VCENTER);
+            dc.drawText(dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_SMALL, noWeather, Graphics.TEXT_JUSTIFY_CENTER + Graphics.TEXT_JUSTIFY_VCENTER);
 
         }
 

@@ -1,6 +1,8 @@
 <strings>
     <string id="AppName">Windsock</string>
 
+    <string id="NoWeather">No weather data</string>
+
     <string id="unitKph">km/h</string>
     <string id="unitMph">mph</string>
 </strings>
