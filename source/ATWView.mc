@@ -75,7 +75,7 @@ class ATWView extends WatchUi.DataField {
 
         mph = Application.loadResource(Rez.Strings.unitMph);
         kmh = Application.loadResource(Rez.Strings.unitKph);
-        noWeather = Application.loadResource(Rez.Strings.noWeather);
+        noWeather = Application.loadResource(Rez.Strings.NoWeather);
     }
 
     private function arrowToPoly( dx as Numeric, dy as Numeric, sz as Numeric, rot as Numeric) {
