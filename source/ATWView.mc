@@ -124,7 +124,7 @@ class ATWView extends WatchUi.DataField {
     function compute(info as Activity.Info) as Void {
         if(info has :currentHeading){
             if (info.currentHeading != null) {
-                mHeading = info.currentHeading as Number;
+                mHeading = Math.toDegrees(info.currentHeading as Number);
             } else {
                 mHeading = 0;
             }
@@ -143,7 +143,7 @@ class ATWView extends WatchUi.DataField {
             mWindBearing = 0;
             mWindValid = false;
         }
-
+        
         if (mWindBearing == null) {
             setForecastWeather();
         }
@@ -164,9 +164,13 @@ class ATWView extends WatchUi.DataField {
     }
 
     function getArrowColor() {
-        var heading = 180-(Math.toDegrees(mHeading) - mWindBearing).toLong() % 360;
-        var vy = -mWindSpeedMs * Math.cos(Math.toRadians(heading));
-        System.println(heading + " - " + vy);
+        var heading = (180 - (mHeading - mWindBearing).toLong()) % 360;
+        var vy = 0;
+        if (heading >=125 && heading <= 235) {
+            vy = mWindSpeedMs;
+        } else {
+            vy = -mWindSpeedMs * Math.cos(Math.toRadians(heading)) * 1.5;
+        }
         // chose color mapping based on heading
         var colorMap = headwindColors;
         for (var i = colorMap.size()-1 ; i >= 0; i--) {
@@ -175,6 +179,14 @@ class ATWView extends WatchUi.DataField {
             }
         }
         return colorMap[0][1];
+    }
+
+    function drawPoly(dc as DC, points) {
+        for (var i = 1; i < points.size(); i++) {
+            dc.drawLine(points[i-1][0], points[i-1][1], points[i][0], points[i][1]);
+        }
+        var last = points.size()-1;
+        dc.drawLine(points[0][0], points[0][1], points[last][0], points[last][1]);
     }
 
     // Display the value you computed here. This will be called
@@ -208,20 +220,29 @@ class ATWView extends WatchUi.DataField {
             // Call parent's onUpdate(dc) to redraw the layout
             View.onUpdate(dc);
 
-            dc.setPenWidth(2);
+            dc.setPenWidth(3);
             dc.setAntiAlias(true);
             dc.setColor(fg, bg);
             dc.fillCircle(indicatorX, indicatorY, indicatorR);
             dc.setColor(bg, bg);
             dc.drawCircle(indicatorX, indicatorY, indicatorR);
+            dc.setPenWidth(2);
 
-            var heading = 180-(Math.toDegrees(mHeading) - mWindBearing).toLong() % 360;
+            if (mWindForecast) {
+                dc.setColor(Graphics.COLOR_ORANGE, bg);
+                dc.drawCircle(indicatorX, indicatorY, indicatorR-2);
+            }
+            dc.setPenWidth(1);
+
+            var heading = 180-(mHeading - mWindBearing).toLong() % 360;
             heading = Math.toRadians(heading);
 
             var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, heading);
             var color = getArrowColor();
             dc.setColor(color, bg);
             dc.fillPolygon(poly);
+            dc.setColor(bg, fg);
+            drawPoly(dc, poly);
         } else {
             wind.setText("");
             unit.setText("");
@@ -229,7 +250,6 @@ class ATWView extends WatchUi.DataField {
             View.onUpdate(dc);
             dc.setColor(Graphics.COLOR_ORANGE, bg);
             dc.drawText(dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_SMALL, noWeather, Graphics.TEXT_JUSTIFY_CENTER + Graphics.TEXT_JUSTIFY_VCENTER);
-
         }
 
     }
