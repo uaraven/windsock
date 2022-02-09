@@ -20,30 +20,6 @@ class ATWView extends WatchUi.DataField {
         [9, Graphics.COLOR_RED]
     ];
 
-    private var sidewindColors = [
-        [0, Graphics.COLOR_GREEN],
-        [6, Graphics.COLOR_YELLOW],
-        [9, Graphics.COLOR_ORANGE],
-        [12, Graphics.COLOR_RED]
-    ];
-
-    private var tailwindColors = [
-        [0, Graphics.COLOR_GREEN]
-    ];
-
-    // mapping between relative wind bearing and the wind speed color mapping
-    // i.e. if the wind bearing is between ±60º from the front it is treated as a headwind
-    // if the wind comes from anywhere from the back, it is treated as a tailwind (even if it is side-ish tailwind)
-
-    private var headingColors = [
-        [-180, -120, headwindColors],
-        [120, 180, headwindColors],
-        [90, 120, sidewindColors],
-        [-120, -90, sidewindColors],
-        [-90, 90, tailwindColors]
-    ];
-
-
     private var arrow = [
         new Vector2(0, -0.9),
         new Vector2(-0.33, 0.8),
@@ -56,6 +32,7 @@ class ATWView extends WatchUi.DataField {
     hidden var mWindSpeedMs as Numeric;
     hidden var mWindBearing as Numeric;
     hidden var mWindValid as Boolean;
+    hidden var mWindForecast as Boolean;
 
     hidden var indicatorX as Numeric;
     hidden var indicatorY as Numeric;
@@ -72,6 +49,7 @@ class ATWView extends WatchUi.DataField {
         mWindSpeedMs = -1;
         mWindBearing = 0.0f;
         mWindValid = false;
+        mWindForecast = false;
 
         mph = Application.loadResource(Rez.Strings.unitMph);
         kmh = Application.loadResource(Rez.Strings.unitKph);
@@ -151,6 +129,8 @@ class ATWView extends WatchUi.DataField {
                 mHeading = 0;
             }
         }
+        System.println("Heading: " + mHeading);
+        mWindForecast = false;
         var w = Weather.getCurrentConditions();
         if (w != null) {
             mWindSpeedMs = w.windSpeed;
@@ -165,26 +145,32 @@ class ATWView extends WatchUi.DataField {
         }
 
         if (mWindBearing == null) {
-            mWindBearing = 0;
-            mWindValid = false;
+            setForecastWeather();
         }
     }
 
-    function getArrowColor() {
-        var heading = (mWindBearing + 180 + Math.toDegrees(mHeading)).toLong();
-        if (heading > 180) {
-            heading = heading - 360;
+    function setForecastWeather() {
+        mWindBearing = 0;
+        mWindValid = false;
+        var hf = Weather.getHourlyForecast();
+        if (hf == null || hf.size() < 1) {
+            return;
         }
+        mWindBearing = hf[0].windBearing;
+        mWindSpeedMs = hf[0].windSpeed;
+        mWindSpeed = convertSpeed(hf[0].windSpeed);
+        mWindValid = true;
+        mWindForecast = true;
+    }
+
+    function getArrowColor() {
+        var heading = 180-(Math.toDegrees(mHeading) - mWindBearing).toLong() % 360;
+        var vy = -mWindSpeedMs * Math.cos(Math.toRadians(heading));
+        System.println(heading + " - " + vy);
         // chose color mapping based on heading
         var colorMap = headwindColors;
-        for (var i = 0; i < headingColors.size(); i++) {
-            if (heading >= headingColors[i][0] && heading <= headingColors[i][1]) {
-                colorMap = headingColors[i][2];
-                break;
-            }
-        }
         for (var i = colorMap.size()-1 ; i >= 0; i--) {
-            if (mWindSpeedMs > colorMap[i][0]) {
+            if (vy > colorMap[i][0]) {
                 return colorMap[i][1];
             }
         }
@@ -208,11 +194,13 @@ class ATWView extends WatchUi.DataField {
         if (getBackgroundColor() == Graphics.COLOR_BLACK) {
             unit.setColor(Graphics.COLOR_WHITE);
             wind.setColor(Graphics.COLOR_WHITE);
-            fg = Graphics.COLOR_DK_GRAY;
+            fg = Graphics.COLOR_BLACK;
+            bg = Graphics.COLOR_WHITE;
         } else {
             unit.setColor(Graphics.COLOR_BLACK);
             wind.setColor(Graphics.COLOR_BLACK);
-            fg = Graphics.COLOR_LT_GRAY;
+            fg = Graphics.COLOR_WHITE;
+            bg = Graphics.COLOR_BLACK;
         }
         if (mWindValid) {
             wind.setText(mWindSpeed.format("%.1f"));
@@ -222,12 +210,15 @@ class ATWView extends WatchUi.DataField {
 
             dc.setPenWidth(2);
             dc.setAntiAlias(true);
-            dc.setColor(0xFF101040, bg);
-            dc.fillCircle(indicatorX, indicatorY, indicatorR);
             dc.setColor(fg, bg);
+            dc.fillCircle(indicatorX, indicatorY, indicatorR);
+            dc.setColor(bg, bg);
             dc.drawCircle(indicatorX, indicatorY, indicatorR);
 
-            var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, Math.toRadians(mWindBearing + 180) + mHeading);
+            var heading = 180-(Math.toDegrees(mHeading) - mWindBearing).toLong() % 360;
+            heading = Math.toRadians(heading);
+
+            var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, heading);
             var color = getArrowColor();
             dc.setColor(color, bg);
             dc.fillPolygon(poly);
