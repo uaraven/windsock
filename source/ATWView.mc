@@ -143,7 +143,7 @@ class ATWView extends WatchUi.DataField {
             mWindBearing = 0;
             mWindValid = false;
         }
-        
+
         if (mWindBearing == null) {
             setForecastWeather();
         }
@@ -248,7 +248,7 @@ class ATWView extends WatchUi.DataField {
             unit.setText("");
             // Call parent's onUpdate(dc) to redraw the layout
             View.onUpdate(dc);
-            dc.setColor(Graphics.COLOR_ORANGE, bg);
+            dc.setColor(bg, Graphics.COLOR_TRANSPARENT);
             dc.drawText(dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_SMALL, noWeather, Graphics.TEXT_JUSTIFY_CENTER + Graphics.TEXT_JUSTIFY_VCENTER);
         }
 
