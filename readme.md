@@ -13,6 +13,8 @@ Requires Connect IQ 3.2 and higher and works* on following devices:
 
 Data field displays direction the wind is coming at you and wind speed (units depend on your device settings).
 
+For the version of Windsock that supports almost all ConnectIQ-capable Edge devices and more accurate wind data for the cost of more complex setup see [Windsock OWM](https://github.com/uaraven/windsock_owm)
+
 ![](data_field.png)
 
 Arrow will change the color from green to red depending on the wind strength and direction, i.e. tailwind is always good(green) and light headwind is not a big deal either (green), but stronger headwind will be shown in orange or red.
