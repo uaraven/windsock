@@ -56,7 +56,8 @@ class ATWView extends WatchUi.DataField {
         noWeather = Application.loadResource(Rez.Strings.NoWeather);
     }
 
-    private function arrowToPoly( dx as Numeric, dy as Numeric, sz as Numeric, rot as Numeric) {
+    private function arrowToPoly( dx as Numeric, dy as Numeric, sz as Numeric, rotD as Numeric) {
+        var rot = Math.toRadians(rotD);
         var result = new [arrow.size()];
         for (var i = 0; i < arrow.size(); i++) {
             result[i] = arrow[i].scaleRotateTranslate(sz, rot, dx, dy).asArray();
@@ -164,7 +165,7 @@ class ATWView extends WatchUi.DataField {
     }
 
     function getArrowColor() {
-        var heading = (180 - (mHeading - mWindBearing).toLong()) % 360;
+        var heading = (mHeading - mWindBearing).toLong() % 360;
         var vy = 0;
         if (heading >=125 && heading <= 235) {
             vy = mWindSpeedMs;
@@ -234,8 +235,7 @@ class ATWView extends WatchUi.DataField {
             }
             dc.setPenWidth(1);
 
-            var heading = 180-(mHeading - mWindBearing).toLong() % 360;
-            heading = Math.toRadians(heading);
+            var heading = (mHeading - mWindBearing).toLong() % 360;
 
             var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, heading);
             var color = getArrowColor();

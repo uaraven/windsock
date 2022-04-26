@@ -26,7 +26,7 @@ The windsock data field uses Garmin provided weather data, make sure it is enabl
 Sometimes there is no wind data in the current weather conditions reported by Garmin, in this case Windsock will try to use closest forecast value. If that's happening, wind direction indicator will display additional orange band.
 ![](data_field_forecast.png)
 
-Garmin devices update the weather every 15-30 minutes, so the wind strength and direction shown by Windsock can become stale. Treat it as approximate suggestion, not like definite truth.
+Garmin devices update the weather every 15-30 minutes, so the wind strength and direction shown by Windsock can become stale. Treat it as an approximate suggestion, not as the definite truth.
 
 ## License
 
